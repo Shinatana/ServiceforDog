@@ -1,10 +1,10 @@
 package main
 
 import (
+	"ServiceforDog/internal"
 	"context"
 	"os"
 	"os/signal"
-	"service/internal"
 	"syscall"
 	"time"
 )
