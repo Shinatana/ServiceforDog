@@ -9,10 +9,11 @@ type Http struct {
 	service *http.Server
 }
 
-func NewHttpService() *Http {
+func NewHttpService(router http.Handler) *Http {
 	return &Http{
 		service: &http.Server{
-			Addr: ":8080",
+			Addr:    ":8080",
+			Handler: router,
 		},
 	}
 }
@@ -22,10 +23,6 @@ func (h *Http) Start() error {
 		return err
 	}
 	return nil
-}
-
-func (h *Http) AddHandlerFunc(path string, fn http.HandlerFunc) {
-	http.HandleFunc(path, fn)
 }
 
 func (h *Http) Stop(ctx context.Context) error {

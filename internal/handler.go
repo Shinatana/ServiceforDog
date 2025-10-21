@@ -9,7 +9,7 @@ import (
 
 type Kennel struct {
 	dogs map[string]Dog
-	mu   sync.RWMutex
+	mu   sync.Mutex
 }
 
 func NewKennel() *Kennel {
@@ -18,7 +18,7 @@ func NewKennel() *Kennel {
 	}
 }
 
-func (k *Kennel) AddDog() http.HandlerFunc {
+func (k *Kennel) GetDog() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		dogID := r.PathValue("id")
@@ -28,8 +28,8 @@ func (k *Kennel) AddDog() http.HandlerFunc {
 			return
 		}
 
-		k.mu.RLock()
-		defer k.mu.RUnlock()
+		k.mu.Lock()
+		defer k.mu.Unlock()
 		dog, ok := k.dogs[dogID]
 
 		if !ok {
@@ -63,15 +63,12 @@ func (k *Kennel) PostDog() http.HandlerFunc {
 		k.dogs[dogID] = dog
 
 		w.WriteHeader(http.StatusCreated)
-		_ = json.NewEncoder(w).Encode(map[string]any{
-			"id": dogID,
-		})
+		_ = json.NewEncoder(w).Encode(dogID)
 	}
 }
 
 func (k *Kennel) DeleteDog() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
 		dogID := r.PathValue("id")
 
 		if dogID == "" {

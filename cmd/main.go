@@ -3,6 +3,7 @@ package main
 import (
 	"ServiceforDog/internal"
 	"context"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,16 +15,19 @@ const (
 )
 
 func main() {
-	serv := internal.NewHttpService()
 
+	mux := http.NewServeMux()
 	k := internal.NewKennel()
-	serv.AddHandlerFunc("GET /{id}", k.AddDog())
-	serv.AddHandlerFunc("POST /", k.PostDog())
-	serv.AddHandlerFunc("DELETE /{id}", k.DeleteDog())
+
+	mux.HandleFunc("GET /{id}", k.GetDog())
+	mux.HandleFunc("POST /", k.PostDog())
+	mux.HandleFunc("DELETE /{id}", k.DeleteDog())
+
+	serv := internal.NewHttpService(mux)
 
 	go func() {
 		if err := serv.Start(); err != nil {
-			os.Exit(2)
+			os.Exit(1)
 		}
 	}()
 

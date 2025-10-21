@@ -1,4 +1,4 @@
-module ServicefoDog
+module ServiceforDog
 
 go 1.25.1
 
